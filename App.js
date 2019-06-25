@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Button, Alert } from 'react-native';
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import { Input } from "react-native-elements";
 import { ScrollView } from "react-native-gesture-handler";
@@ -29,13 +29,27 @@ class PersonalInfoScreen extends React.Component {
 
         this.state = {
             name: "",
+            nameValid: true,
             phone: "",
+            phoneValid: true,
         }
     }
 
     static navigationOptions = {
         title: 'Set Up Appointment'
     };
+
+    _onSubmit() {
+        Alert.alert("To be continued!")
+    }
+
+    validateName(name) {
+        this.state.nameValid = (this.state.name.length > 0)
+    }
+
+    validatePhone(phone) {
+        this.state.phoneValid = (this.state.phone.length == 11)
+    }
 
     render() {
         return (
@@ -47,6 +61,9 @@ class PersonalInfoScreen extends React.Component {
                     placeholder="Name"
                     value={this.state.name}
                     onChangeText={(name) => this.setState({ name })}
+                    onEndEditing={() => this.validateName()}
+                    errorStyle={{ color: 'red'}}
+                    errorMessage= {this.state.nameValid ? null : "Name can't be blank!"}
                 />
                 <Input
                     name={"phone"}
@@ -55,10 +72,14 @@ class PersonalInfoScreen extends React.Component {
                     placeholder="19495551212"
                     value={this.state.phone}
                     onChangeText={(phone) => this.setState({ phone: phone.replace(/[^0-9]/g, '') })}
+                    onEndEditing={() => this.validatePhone()}
                     maxLength={11}
+                    errorStyle={{ color: 'red'}}
+                    errorMessage={this.state.phoneValid ? null : "US Phone must be 11 digits! (19495551212)"}
                 />
-                <Text>{ this.state.name }</Text>
-                <Text>{ this.state.phone }</Text>
+                <Button title={"Use this info"} onPress={() => this._onSubmit()} />
+                <Text>{ this.state.name } | {this.state.nameValid.toString()} </Text>
+                <Text>{ this.state.phone } | {this.state.phoneValid.toString()} </Text>
             </View>
         );
     }
