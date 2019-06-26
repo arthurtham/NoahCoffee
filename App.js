@@ -3,7 +3,9 @@ import { StyleSheet, Text, View, Button, Alert, SectionList } from 'react-native
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import { Input } from "react-native-elements";
 import { ScrollView } from "react-native-gesture-handler";
-import {ListView} from "react-native-web";
+import { ListView } from "react-native-web";
+import moment from 'moment';
+
 
 class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -103,9 +105,22 @@ class PersonalInfoScreen extends React.Component {
 }
 
 class AppointmentSelectScreen extends React.Component {
+    constructor(props) {
+        super(props)
+    }
+
     static navigationOptions = {
         title: 'Availability'
     };
+
+    GetSectionListItem(item) {
+        //Alert.alert(item);
+        this.props.navigation.navigate("Confirmation", {
+            name: this.props.navigation.getParam("name","NONAME"),
+            phone: this.props.navigation.getParam("phone","NOPHONE"),
+            date: item,
+        });
+    }
 
     render() {
         const { navigation } = this.props;
@@ -125,14 +140,15 @@ class AppointmentSelectScreen extends React.Component {
                 <View style={styles.containerList}>
                     <SectionList
                         sections={[
-                            {title: 'June', data: ['June 24th, 9am']},
-                            {title: 'July', data: ['July 21th, 9am',
-                                    'July 22th, 11am',
-                                    'July 23th, 5pm',
-                                    'July 24th, 9am',
-                                    'July 25th, 8am']},
+                            {title: 'June', data: ['2016-05-12']},
+                            {title: 'July', data: ['2016-07-12',
+                                    '2016-07-13']},
                         ]}
-                        renderItem={({item}) => <Text style={styles.item}>{item}</Text>}
+                        renderItem={({item}) => <Text style={styles.item}
+                                                      onPress={this.GetSectionListItem.bind(this, item)}
+                        >
+                            { moment(item).format('MMM DD, YYYY') }
+                        </Text>}
                         renderSectionHeader={({section}) => <Text style={styles.sectionHeader}>{section.title}</Text>}
                         keyExtractor={(item, index) => index}
                     />
@@ -141,6 +157,32 @@ class AppointmentSelectScreen extends React.Component {
         )
     }
 }
+
+class ConfirmationScreen extends React.Component {
+    constructor(props) {
+        super(props)
+    }
+
+    static navigationOptions = {
+        title: 'Confirm'
+    };
+
+    render() {
+        return (
+            <View style={styles.container}>
+                <Text>Confirmation!</Text>
+                <Text>{ this.props.navigation.getParam("name","NONAME") }</Text>
+                <Text>{ this.props.navigation.getParam("phone","NOPHONE") }</Text>
+                <Text>{ this.props.navigation.getParam("date","NODATE") }</Text>
+                <Button
+                    title={"Confirm Reservation"}
+                />
+            </View>
+        );
+    }
+
+}
+
 
 const styles = StyleSheet.create({
     container: {
@@ -174,6 +216,7 @@ const AppNavigator = createStackNavigator(
         Home: HomeScreen,
         Personal: PersonalInfoScreen,
         AppointmentSelect: AppointmentSelectScreen,
+        Confirmation: ConfirmationScreen,
     },
     {
         initialRouteName: "Home",
