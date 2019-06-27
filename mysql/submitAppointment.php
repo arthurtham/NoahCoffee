@@ -55,7 +55,7 @@ $sql = "INSERT INTO appointments (code, name, phone, datetime) VALUES ('".$code.
 $result = $conn->query($sql);
 
 if ($result === TRUE) {
-    echo json_encode(array("status" => "success", "code" => $code ));
+    
 } else {
     echo json_encode(array("status" => "failed" , "error_message" => $conn->error.toString()));
 };
@@ -64,7 +64,23 @@ $conn->close();
 
 // Part 3: Mark date as unavailable
 
-// $dbdata = array(
-//    "availability" => $dbdata
-// );
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+    die(json_encode(array("status" => "failed" , "error_message" => $conn->connect_error)));
+};
+
+$sql = "UPDATE availability SET busy=true WHERE datetime='".$_POST['datetime']."';";
+$result = $conn->query($sql);
+
+if ($result === TRUE) {
+    echo json_encode(array("status" => "success", "code" => $code ));
+} else {
+    echo json_encode(array("status" => "failed" , "error_message" => $conn->error.toString()));
+};
+
+$conn->close();
+
+
 ?>
