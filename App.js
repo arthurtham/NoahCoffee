@@ -227,13 +227,25 @@ class ConfirmationScreen extends React.Component {
 
     requestReservation() {
         this.setState({networkBusy: true});
-        return fetch(networkIP+"/submitAppointment.php")
+        return fetch(networkIP+"/submitAppointment.php",
+            {
+                method: "POST",
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: this.props.navigation.getParam("name","NONAME") ,
+                    phone: this.props.navigation.getParam("phone","NOPHONE") ,
+                    datetime: this.props.navigation.getParam("date","NODATE") ,
+                })
+            })
             .then((response) => response.json())
             .then((responseJson) => {
                 this.setState({networkBusy: false});
                 let code = this.handleRequest(responseJson);
-                if (code === "false") {
-                    throw error("Failed submission");
+                if (code === "error") {
+                    throw "Failed submission: Check console for error JSON.";
                 } else {
                     let resetAction = StackActions.reset({
                         index: 0, // <-- currect active route from actions array
@@ -263,9 +275,9 @@ class ConfirmationScreen extends React.Component {
     }
 
     handleRequest(json) {
+        console.log(JSON.stringify(json));
         const status = json.status;
-        console.log(status);
-        if (status === "false") {
+        if (status === "failed") {
             return "error";
         };
         return json.code;

@@ -13,7 +13,7 @@ CREATE TABLE `appointments` (
 	id INT AUTO_INCREMENT NOT NULL UNIQUE,
     code VARCHAR(11) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
-    phone INT(11) NOT NULL,
+    phone VARCHAR(11) NOT NULL,
     datetime DATETIME NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (datetime) REFERENCES availability(datetime)
