@@ -4,14 +4,17 @@ import { createStackNavigator, createAppContainer, NavigationActions, StackActio
 import { Input } from "react-native-elements";
 import { ScrollView } from "react-native-gesture-handler";
 import { ListView } from "react-native-web";
+import Dialog from "react-native-dialog";
 import moment from 'moment';
 
-const networkIP = "http://192.168.7.29";
+//const networkIP = "http://192.168.7.29";
+const networkIP = "http://34.83.36.150/noahcoffee/";
 
 class HomeScreen extends React.Component {
     static navigationOptions = {
         title: 'Noah: "Is it lit?"'
     };
+
 
     render() {
         return (
@@ -27,7 +30,8 @@ class HomeScreen extends React.Component {
                 />
                 <Button
                     title={"View my deets"}
-                    disabled={true}
+                    disabled={false}
+                    onPress={() => this.props.navigation.navigate('ConfirmationView')}
                     />
                 <Button
                     title={"About my deets app"}
@@ -52,7 +56,7 @@ class PersonalInfoScreen extends React.Component {
     }
 
     static navigationOptions = {
-        title: 'Appointment'
+        title: 'Make it lit'
     };
 
     _onSubmit() {
@@ -86,6 +90,7 @@ class PersonalInfoScreen extends React.Component {
         return (
             <View style={styles.container}>
                 <Text>Set up an appointment with Noah Ferrer!</Text>
+                <Text>Appointments are two hours, and the location is always random.</Text>
                 <Input
                     name={"name"}
                     label={"Name"}
@@ -106,11 +111,16 @@ class PersonalInfoScreen extends React.Component {
                     onEndEditing={() => this.validatePhone(this.state.phone)}
                     maxLength={11}
                     errorStyle={{ color: 'red'}}
-                    errorMessage={this.state.phoneValid ? "" : "US Phone must be 11 digits! (19495551212)"}
+                    errorMessage={this.state.phoneValid ? "" : "US Phone must be 11 digits! (1 949 555 1212)"}
                 />
                 <Button title={"Use this info"} onPress={() => this._onSubmit()} />
                 <Text>{ this.state.name } | {this.state.nameValid.toString()} </Text>
                 <Text>{ this.state.phone } | {this.state.phoneValid.toString()} </Text>
+
+                <Image
+                    style={{width: 200, height: 200}}
+                    source={require("./assets/coffee.jpg")}
+                />
             </View>
         );
     }
@@ -126,6 +136,10 @@ class AppointmentSelectScreen extends React.Component {
             networkData: null,
         }
     }
+
+    static navigationOptions = {
+        title: 'Make it free'
+    };
 
     componentWillMount() {
         this.requestAvailability();
@@ -152,10 +166,6 @@ class AppointmentSelectScreen extends React.Component {
     handleRequest(json) {
         return json;
     }
-
-    static navigationOptions = {
-        title: 'Availability'
-    };
 
     GetSectionListItem(item) {
         //Alert.alert(item);
@@ -198,11 +208,9 @@ class AppointmentSelectScreen extends React.Component {
                 justifyContent: 'flex-start'
             }}>
                 <View style={styles.container}>
-                    <Text>Using the following info:</Text>
-                    <Text>{name}</Text>
-                    <Text>{phone}</Text>
-                    <Text>In the next 7 days, Noah is free during these times.</Text>
+                    <Text>Noah is free during these times.</Text>
                     <Text>Select a time that works for you.</Text>
+                    <Text>Appointments are usually 2 hours in length.</Text>
                 </View>
                 { availabilityList }
             </View>
@@ -222,7 +230,7 @@ class ConfirmationScreen extends React.Component {
     }
 
     static navigationOptions = {
-        title: 'Confirm'
+        title: 'Make it official'
     };
 
     requestReservation() {
@@ -277,7 +285,7 @@ class ConfirmationScreen extends React.Component {
     handleRequest(json) {
         console.log(JSON.stringify(json));
         const status = json.status;
-        if (status === "failed") {
+        if (status !== "success") {
             return "error";
         };
         return json.code;
@@ -316,7 +324,7 @@ class ConfirmationSuccess extends React.Component {
 
     }
     static navigationOptions = {
-        title: 'Success'
+        title: 'Deets set!'
     };
 
     returnHome() {
@@ -339,12 +347,200 @@ class ConfirmationSuccess extends React.Component {
                     title={"Back home"}
                     onPress={() => this.returnHome()}
                 />
+                <Image
+                    style={{width: 200, height: 200}}
+                    source={require("./assets/noahHappy.jpg")}
+                />
             </View>
         );
     }
 
 }
 
+class ConfirmationViewScreen extends React.Component {
+    constructor(props) {
+        super(props);
+
+
+        this.state = {
+            networkBusy: false,
+            response: null,
+            name: null,
+            phone: null,
+            datetime: null,
+            code: "",
+            codeValid: false,
+            codeNetwork: null,
+            dialogVisible: false,
+        }
+    }
+
+    static navigationOptions = {
+        title: 'View Deets'
+    };
+
+    requestDeletion() {
+        const codeNetwork = this.state.codeNetwork;
+        const datetime = this.state.datetime;
+        this.setState({networkBusy: true});
+        return fetch(networkIP+"/deleteAppointment.php",
+            {
+                method: "POST",
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    code: codeNetwork ,
+                    datetime: datetime,
+                })
+            })
+            .then((response) => response.json())
+            .then((responseJson) => {
+                this.setState({networkBusy: false});
+                let code = this.handleRequest(responseJson);
+                if (code === "error") {
+                    throw "Failed submission: Check console for error JSON.";
+                } else {
+                    this.setState({name: "Reservation deleted!"});
+                    this.setState({phone: ""});
+                    this.setState({datetime: ""});
+                    this.setState( {codeNetwork: null});
+                };
+            })
+            .catch((error) =>{
+                console.error(error);
+                this.setState({networkBusy: false});
+            })
+            .finally(() => {
+                //this.setState({networkBusy: false});
+            });
+    }
+
+    requestReservation() {
+        const codeNetwork = this.state.code;
+        this.setState({networkBusy: true});
+        this.setState( {codeNetwork: null});
+        return fetch(networkIP+"/getAppointment.php",
+            {
+                method: "POST",
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    code: codeNetwork ,
+                })
+            })
+            .then((response) => response.json())
+            .then((responseJson) => {
+                this.setState({networkBusy: false});
+                let code = this.handleRequest(responseJson);
+                if (code === "error") {
+                    throw "Failed submission: Check console for error JSON.";
+                } else {
+                    this.setState({name: code.name});
+                    this.setState({phone: code.phone});
+                    this.setState({datetime: code.datetime});
+                    this.setState( {codeNetwork: (code.phone.length > 0) ? codeNetwork : null});
+                };
+            })
+            .catch((error) =>{
+                console.error(error);
+                this.setState({networkBusy: false});
+            })
+            .finally(() => {
+                //this.setState({networkBusy: false});
+            });
+    }
+
+    handleRequest(json) {
+        console.log(JSON.stringify(json));
+        const status = json.status;
+        if (status !== "success") {
+            return "error";
+        };
+        return json.details;
+        //return json.toString();
+    }
+
+    validateAll() {
+        return this.validateCode(this.state.code);
+    }
+
+    onReviewPress() {
+        if (this.validateAll()) {
+            this.requestReservation();
+        }
+    }
+
+    onCancelPress() {
+        this.setState({dialogVisible: false})
+    }
+    onDeletePress() {
+        this.setState({dialogVisible: false})
+        this.requestDeletion();
+    }
+
+    validateCode(code) {
+        let booleanStatement = code.length == 6;
+        this.setState({codeValid: (booleanStatement)});
+        return booleanStatement;
+    }
+
+    render() {
+        const activityBusy =  (this.state.networkBusy) ? (
+                <ActivityIndicator/>
+        ) : null;
+
+        const activityDetails = (
+            <View>
+                <Text>Details: </Text>
+                <Text>{ this.state.name }</Text>
+                <Text>{ this.state.phone }</Text>
+                <Text>{ this.state.datetime }</Text>
+                <Button
+                    title={"Delete Reservation"}
+                    onPress={() => this.setState({dialogVisible: true})}
+                    disabled={this.state.codeNetwork == null}
+                    />
+                <Dialog.Container visible={this.state.dialogVisible}>
+                    <Dialog.Title>Account delete</Dialog.Title>
+                    <Dialog.Description>
+                        Do you want to delete this account? You cannot undo this action.
+                    </Dialog.Description>
+                    <Dialog.Button label="Cancel" onPress={() => this.onCancelPress()} />
+                    <Dialog.Button label="Delete" onPress={() => this.onDeletePress()} />
+                </Dialog.Container>
+            </View>
+        );
+
+        return (
+            <View style={styles.container}>
+                <Text>View Confirmation</Text>
+                <Text>Enter your reservation code to review your reservation...</Text>
+                <Input
+                    name={"code"}
+                    label={"Code"}
+                    placeholder="Code"
+                    value={this.state.code}
+                    onChangeText={(code) => this.setState({ code })}
+                    //onEndEditing={() => this.validateName(this.state.code)}
+                    errorStyle={{ color: 'red'}}
+                    errorMessage= {this.state.codeValid ? "" : "Code must be 6 letters/numbers!"}
+                />
+                <Button
+                    title={"Review Reservation"}
+                    onPress={() => this.onReviewPress()}
+                    disabled={this.state.networkBusy}
+                />
+                { activityBusy }
+                { activityDetails }
+            </View>
+        );
+    }
+
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -380,6 +576,7 @@ const AppNavigator = createStackNavigator(
         AppointmentSelect: AppointmentSelectScreen,
         Confirmation: ConfirmationScreen,
         Successful: ConfirmationSuccess,
+        ConfirmationView: ConfirmationViewScreen
     },
     {
         initialRouteName: "Home",

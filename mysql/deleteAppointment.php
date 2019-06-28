@@ -12,37 +12,38 @@ catch (Exception $e){
     die(json_encode(array("status" => "failed" , "error_message" => "No values can be determined")));
 }
 
-if ((isset($_POST['name'])) && (isset($_POST['phone'])) && (isset($_POST['datetime']))) {
+if ((isset($_POST['code']))) {
     
 } else {
     die(json_encode(array("status" => "failed" , "error_message" => "Combination of values not valid")));
 };
 
 // Part 1: Set a reservation code
-$code = "";
-$result = NULL;
-while(true) {
-    $code = substr(str_shuffle(bin2hex(random_bytes(6))),0,6);
-    // Create connection
-    $conn = new mysqli($servername, $username, $password, $dbname);
-    // Check connection
-    if ($conn->connect_error) {
-        die(json_encode(array("status" => "failed" , "error_message" => $conn->connect_error)));
-    };
-
-    $sql = "SELECT code FROM appointments WHERE code='".$code."' LIMIT 1";
-    $result = $conn->query($sql);
-    
-    if ($result->num_rows <= 0) {
-        //alert("Yes!");
-        $conn->close();
-        break;
-    }
-    //alert("No!");
-    $conn->close();
-};
+//$code = "";
+//$result = NULL;
+//while(true) {
+//    $code = substr(str_shuffle(bin2hex(random_bytes(6))),0,6);
+//    // Create connection
+//    $conn = new mysqli($servername, $username, $password, $dbname);
+//    // Check connection
+//    if ($conn->connect_error) {
+//        die(json_encode(array("status" => "failed" , "error_message" => $conn->connect_error)));
+//    };
+//
+//    $sql = "SELECT code FROM appointments WHERE code='".$code."' LIMIT 1";
+//    $result = $conn->query($sql);
+//
+//    if ($result->num_rows == 1) {
+//        //alert("Yes!");
+//        $conn->close();
+//        break;
+//    } else {
+//        die(json_encode(array("status" => "failed" , "error_message" => "There is no code")));
+//    };
+//};
 
 // Part 2: Add info to the db
+$code = $_POST['code'];
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -51,13 +52,13 @@ if ($conn->connect_error) {
     die(json_encode(array("status" => "failed" , "error_message" => $conn->connect_error)));
 };
 
-$sql = "INSERT INTO appointments (code, name, phone, datetime) VALUES ('".$code."', '".$_POST['name']."', '".$_POST['phone']."', '".$_POST['datetime']."')";
+$sql = "DELETE FROM appointments WHERE code='".$code."' AND datetime='".$_POST['datetime']."';";
 $result = $conn->query($sql);
 
 if ($result === TRUE) {
     
 } else {
-    echo json_encode(array("status" => "failed" , "error_message" => $conn->error.toString()));
+    die(json_encode(array("status" => "failed" , "error_message" => $conn->error)));
 };
 
 $conn->close();
@@ -71,13 +72,13 @@ if ($conn->connect_error) {
     die(json_encode(array("status" => "failed" , "error_message" => $conn->connect_error)));
 };
 
-$sql = "UPDATE availability SET busy=true WHERE datetime='".$_POST['datetime']."';";
+$sql = "UPDATE availability SET busy=false WHERE datetime='".$_POST['datetime']."';";
 $result = $conn->query($sql);
 
 if ($result === TRUE) {
     echo json_encode(array("status" => "success", "code" => $code ));
 } else {
-    echo json_encode(array("status" => "failed" , "error_message" => $conn->error.toString()));
+    echo json_encode(array("status" => "failed" , "error_message" => $conn->error));
 };
 
 $conn->close();
