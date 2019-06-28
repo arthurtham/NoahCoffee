@@ -1,6 +1,6 @@
 <?php
 $servername = "localhost:3306";
-$username = "root"; 
+$username = "pi"; 
 $password = "raspberry";
 $dbname = "database";
 
@@ -30,7 +30,7 @@ while(true) {
         die(json_encode(array("status" => "failed" , "error_message" => $conn->connect_error)));
     };
 
-    $sql = "SELECT code FROM appointments WHERE code='".$code."' LIMIT 1";
+    $sql = "SELECT code FROM `appointments` WHERE code='".$code."' LIMIT 1";
     $result = $conn->query($sql);
     
     if ($result->num_rows <= 0) {
@@ -51,7 +51,7 @@ if ($conn->connect_error) {
     die(json_encode(array("status" => "failed" , "error_message" => $conn->connect_error)));
 };
 
-$sql = "INSERT INTO appointments (code, name, phone, datetime) VALUES ('".$code."', '".$_POST['name']."', '".$_POST['phone']."', '".$_POST['datetime']."')";
+$sql = "INSERT INTO `appointments` (code, name, phone, datetime) VALUES ('".$code."', '".$_POST['name']."', '".$_POST['phone']."', '".$_POST['datetime']."')";
 $result = $conn->query($sql);
 
 if ($result === TRUE) {
@@ -71,7 +71,7 @@ if ($conn->connect_error) {
     die(json_encode(array("status" => "failed" , "error_message" => $conn->connect_error)));
 };
 
-$sql = "UPDATE availability SET busy=true WHERE datetime='".$_POST['datetime']."';";
+$sql = "UPDATE `availability` SET busy=true WHERE datetime='".$_POST['datetime']."';";
 $result = $conn->query($sql);
 
 if ($result === TRUE) {

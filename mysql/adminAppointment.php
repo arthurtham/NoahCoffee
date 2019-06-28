@@ -1,6 +1,6 @@
 <?php
 $servername = "localhost:3306";
-$username = "root";
+$username = "pi";
 $password = "raspberry";
 $dbname = "database";
 
@@ -79,7 +79,7 @@ if (isset($_POST['addAvailability'])) {
         echo $conn->connect_error;
     };
 
-    $sql = "INSERT INTO availability (datetime) VALUES ('".$_POST['datetime']."');";
+    $sql = "INSERT INTO `availability` (datetime) VALUES ('".$_POST['datetime']."');";
     $result = $conn->query($sql);
 
     if ($result === TRUE) {
@@ -101,7 +101,7 @@ if (isset($_POST['deleteAvailability'])) {
         echo $conn->connect_error;
     };
 
-    $sql = "DELETE FROM availability WHERE id='".$_POST['deleteAvailability']."';";
+    $sql = "DELETE FROM `availability` WHERE id='".$_POST['deleteAvailability']."';";
     $result = $conn->query($sql);
 
     if ($result === TRUE) {
@@ -123,7 +123,7 @@ if (isset($_POST['deleteAppointment'])) {
         echo $conn->connect_error;
     };
 
-    $sql = "DELETE FROM appointments WHERE id='".$_POST['deleteAppointment']."';";
+    $sql = "DELETE FROM `appointments` WHERE id='".$_POST['deleteAppointment']."';";
     $result = $conn->query($sql);
 
     if ($result === TRUE) {
@@ -132,7 +132,7 @@ if (isset($_POST['deleteAppointment'])) {
         echo $conn->error;
     };
     
-    $sql = "UPDATE availability SET busy=0 WHERE id='".$_POST['id']."';";
+    $sql = "UPDATE `availability` SET busy=0 WHERE id='".$_POST['id']."';";
     $result = $conn->query($sql);
 
     if ($result === TRUE) {
@@ -154,7 +154,7 @@ if ($conn->connect_error) {
     echo $conn->connect_error;
 };
 
-$sql = "SELECT id, datetime, busy FROM availability ORDER BY datetime ASC;";
+$sql = "SELECT id, datetime, busy FROM `availability` ORDER BY datetime ASC;";
 $result = $conn->query($sql);
 
 $availability_table = "<table><tr><th>id</th><th>datetime</th><th>busy</th></tr>";
@@ -178,7 +178,7 @@ if ($conn->connect_error) {
     echo $conn->connect_error;
 };
 
-$sql = "SELECT id, code, name, phone, datetime FROM appointments ORDER BY datetime ASC;";
+$sql = "SELECT id, code, name, phone, datetime FROM `appointments` ORDER BY datetime ASC;";
 $result = $conn->query($sql);
 
 $appointment_table = "<table><tr><th>id</th><th>code</th><th>name</th><th>phone</th><th>datetime</th><th>action</th></tr>";

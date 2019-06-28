@@ -1,6 +1,6 @@
 <?php
 $servername = "localhost:3306";
-$username = "root"; 
+$username = "pi"; 
 $password = "raspberry";
 $dbname = "database";
 
@@ -52,7 +52,7 @@ if ($conn->connect_error) {
     die(json_encode(array("status" => "failed" , "error_message" => $conn->connect_error)));
 };
 
-$sql = "DELETE FROM appointments WHERE code='".$code."' AND datetime='".$_POST['datetime']."';";
+$sql = "DELETE FROM `appointments` WHERE code='".$code."' AND datetime='".$_POST['datetime']."';";
 $result = $conn->query($sql);
 
 if ($result === TRUE) {
@@ -72,7 +72,7 @@ if ($conn->connect_error) {
     die(json_encode(array("status" => "failed" , "error_message" => $conn->connect_error)));
 };
 
-$sql = "UPDATE availability SET busy=false WHERE datetime='".$_POST['datetime']."';";
+$sql = "UPDATE `availability` SET busy=false WHERE datetime='".$_POST['datetime']."';";
 $result = $conn->query($sql);
 
 if ($result === TRUE) {

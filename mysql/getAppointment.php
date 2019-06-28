@@ -1,6 +1,6 @@
 <?php
 $servername = "localhost:3306";
-$username = "root";
+$username = "pi";
 $password = "raspberry";
 $dbname = "database";
 
@@ -25,7 +25,7 @@ if ($conn->connect_error) {
     die(json_encode(array("status" => "failed" , "error_message" => "Connection error")));
 }
 
-$sql = "SELECT name,phone,datetime FROM appointments WHERE code='".$_POST['code']."' LIMIT 1;";
+$sql = "SELECT name,phone,datetime FROM `appointments` WHERE code='".$_POST['code']."' LIMIT 1;";
 $result = $conn->query($sql);
 
 $dbdata = array();

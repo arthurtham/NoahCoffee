@@ -11,21 +11,28 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "SELECT id, datetime FROM availability WHERE busy=0;";
+$sql = "SELECT id, datetime FROM `availability` WHERE busy=0;";
 $result = $conn->query($sql);
 
 $dbdata = array();
 
-while($row = $result->fetch_assoc()) {
-    $dbdata[]=$row;
-}
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $dbdata[]=$row;
+    }
 
-$conn->close();
+    echo json_encode($dbdata);
+    $conn->close();
+    }
+else {
+    $dbdata = array(
+        "id" => "0",
+        "datetime" => "00/00/00 00:00"
+        );
+    );
 
-// $dbdata = array(
-//    "availability" => $dbdata
-// );
-
-echo json_encode($dbdata);
+    echo json_encode($dbdata);
+    $conn->close();
+};
 ?>
  
