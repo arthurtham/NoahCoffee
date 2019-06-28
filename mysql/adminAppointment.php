@@ -161,7 +161,7 @@ $availability_table = "<table><tr><th>id</th><th>datetime</th><th>busy</th></tr>
 if ($result->num_rows > 0) {
     // output data of each row
     while($row = $result->fetch_assoc()) {
-        $availability_table .= "<tr><td>" . $row["id"]. "</td><td>" . $row["datetime"]. "</td><td>" . ($row["busy"] ? "Appt Set" : "<form action/'adminAppointment.php' method='post'><input type='hidden' name='deleteAvailability' value='". $row["id"] ."'><input type='submit' value='Delete'></form>") . "</td></tr>";
+        $availability_table .= "<tr><td>" . $row["id"]. "</td><td>" . $row["datetime"]. "</td><td>" . ($row["busy"] ? "Appt Set" : "<form action='adminAppointment.php' method='post'><input type='hidden' name='deleteAvailability' value='". $row["id"] ."'><input type='submit' value='Delete'></form>") . "</td></tr>";
     }
 } else {
     $availability_table .= "<tr><td>0 results</td></tr>";
@@ -185,7 +185,7 @@ $appointment_table = "<table><tr><th>id</th><th>code</th><th>name</th><th>phone<
 if ($result->num_rows > 0) {
     // output data of each row
     while($row = $result->fetch_assoc()) {
-        $appointment_table .= "<tr><td>" . $row["id"]. "</td><td>" . $row["code"]. "</td><td>" . $row["name"]. "</td><td>" . $row["phone"]. "</td><td>" . $row["datetime"]. "</td><td>" . "<form action/'adminAppointment.php' method='post'><input type='hidden' name='deleteAppointment' value='". $row["id"] ."'><input type='hidden' name='id' value='". $row["id"] ."'><input type='submit' value='Delete'></form>" . "</td></tr>";
+        $appointment_table .= "<tr><td>" . $row["id"]. "</td><td>" . $row["code"]. "</td><td>" . $row["name"]. "</td><td>" . $row["phone"]. "</td><td>" . $row["datetime"]. "</td><td>" . "<form action='adminAppointment.php' method='post'><input type='hidden' name='deleteAppointment' value='". $row["id"] ."'><input type='hidden' name='id' value='". $row["id"] ."'><input type='submit' value='Delete'></form>" . "</td></tr>";
     }
 } else {
     $appointment_table .= "<tr><td>0 results</td></tr>";
@@ -204,7 +204,7 @@ echo <<<OUTPUT
 
 <h2>Add availability</h2>
 
-<form action="/adminAppointment.php" method="post">
+<form action="adminAppointment.php" method="post">
   <input type="hidden" name="addAvailability" value="1">
   Date:<br>
   <input type="datetime-local" name="datetime">

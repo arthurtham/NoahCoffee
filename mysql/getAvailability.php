@@ -29,10 +29,9 @@ else {
         "id" => "0",
         "datetime" => "00/00/00 00:00"
         );
-    );
 
     echo json_encode($dbdata);
     $conn->close();
-};
+    };
 ?>
  
