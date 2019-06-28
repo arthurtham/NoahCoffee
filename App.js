@@ -8,7 +8,7 @@ import Dialog from "react-native-dialog";
 import moment from 'moment';
 
 //const networkIP = "http://192.168.7.29";
-const networkIP = "http://34.83.36.150/noahcoffee/";
+const networkIP = "http://34.83.36.150/noahcoffee";
 
 class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -35,8 +35,33 @@ class HomeScreen extends React.Component {
                     />
                 <Button
                     title={"About my deets app"}
-                    disabled={true}
+                    disabled={false}
+                    onPress={() => this.props.navigation.navigate('AboutView')}
                 />
+            </View>
+        );
+    }
+
+}
+
+class AboutScreen extends React.Component {
+    static navigationOptions = {
+        title: 'About'
+    };
+
+
+    render() {
+        return (
+            <View style={styles.container}>
+                <Image
+                    style={{width: 200, height: 200}}
+                    source={require("./assets/noah.png")}
+                />
+                <Text>Noah's Coffee Appointments App!</Text>
+                <Text>@browntulstar</Text>
+                <Text>Arthur Tham</Text>
+                <Text>Based on the stories by Noah</Text>
+                <Text>v0.1a</Text>
             </View>
         );
     }
@@ -576,7 +601,8 @@ const AppNavigator = createStackNavigator(
         AppointmentSelect: AppointmentSelectScreen,
         Confirmation: ConfirmationScreen,
         Successful: ConfirmationSuccess,
-        ConfirmationView: ConfirmationViewScreen
+        ConfirmationView: ConfirmationViewScreen,
+        AboutView: AboutScreen
     },
     {
         initialRouteName: "Home",
